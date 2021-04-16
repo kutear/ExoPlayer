@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
@@ -43,6 +44,7 @@ import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.EventLogger;
 import com.google.android.exoplayer2.util.GlUtil;
 import com.google.android.exoplayer2.util.Util;
+import com.kutear.gl.render.capture.GLCapture;
 import java.util.UUID;
 
 /**
@@ -54,17 +56,23 @@ public final class MainActivity extends Activity {
   private static final String TAG = "MainActivity";
 
   private static final String DEFAULT_MEDIA_URI =
-      "https://storage.googleapis.com/exoplayer-test-media-1/mkv/android-screens-lavf-56.36.100-aac-avc-main-1280x720.mkv";
+      "https://file-examples-com.github.io/uploads/2017/04/file_example_MP4_1280_10MG.mp4";
 
   private static final String ACTION_VIEW = "com.google.android.exoplayer.gldemo.action.VIEW";
   private static final String EXTENSION_EXTRA = "extension";
   private static final String DRM_SCHEME_EXTRA = "drm_scheme";
   private static final String DRM_LICENSE_URL_EXTRA = "drm_license_url";
 
-  @Nullable private PlayerView playerView;
-  @Nullable private VideoProcessingGLSurfaceView videoProcessingGLSurfaceView;
+  @Nullable
+  private PlayerView playerView;
+  @Nullable
+  private VideoProcessingGLSurfaceView videoProcessingGLSurfaceView;
 
-  @Nullable private SimpleExoPlayer player;
+  @Nullable
+  private SimpleExoPlayer player;
+
+  @NonNull
+  private final GLCapture glCapture = GLCapture.Companion.create();
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,16 +84,22 @@ public final class MainActivity extends Activity {
     boolean requestSecureSurface = getIntent().hasExtra(DRM_SCHEME_EXTRA);
     if (requestSecureSurface && !GlUtil.isProtectedContentExtensionSupported(context)) {
       Toast.makeText(
-              context, R.string.error_protected_content_extension_not_supported, Toast.LENGTH_LONG)
+          context, R.string.error_protected_content_extension_not_supported, Toast.LENGTH_LONG)
           .show();
     }
 
     VideoProcessingGLSurfaceView videoProcessingGLSurfaceView =
         new VideoProcessingGLSurfaceView(
-            context, requestSecureSurface, new BitmapOverlayVideoProcessor(context));
+            context, requestSecureSurface,
+            new OverlayVideoProcessor(this));
+//            new BitmapOverlayVideoProcessor(this));
     FrameLayout contentFrame = findViewById(R.id.exo_content_frame);
     contentFrame.addView(videoProcessingGLSurfaceView);
     this.videoProcessingGLSurfaceView = videoProcessingGLSurfaceView;
+
+    findViewById(R.id.capture_stop).setOnClickListener(v -> glCapture.stopCapture());
+    findViewById(R.id.capture_start).setOnClickListener(v -> glCapture.startCapture());
+    findViewById(R.id.capture_hello).setOnClickListener(v -> JNI.INSTANCE.sayHello());
   }
 
   @Override

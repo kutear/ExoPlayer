@@ -47,6 +47,8 @@ import javax.microedition.khronos.opengles.GL10;
   private final Context context;
   private final Paint paint;
   private final int[] textures;
+  private final int[] frameBufferTexture;
+  private final int[] frameBuffers;
   private final Bitmap overlayBitmap;
   private final Bitmap logoBitmap;
   private final Canvas overlayCanvas;
@@ -65,6 +67,8 @@ import javax.microedition.khronos.opengles.GL10;
     paint.setAntiAlias(true);
     paint.setARGB(0xFF, 0xFF, 0xFF, 0xFF);
     textures = new int[1];
+    frameBuffers = new int[1];
+    frameBufferTexture = new int[1];
     overlayBitmap = Bitmap.createBitmap(OVERLAY_WIDTH, OVERLAY_HEIGHT, Bitmap.Config.ARGB_8888);
     overlayCanvas = new Canvas(overlayBitmap);
     try {
@@ -97,6 +101,7 @@ import javax.microedition.khronos.opengles.GL10;
     this.uniforms = uniforms;
     GLES20.glGenTextures(1, textures, 0);
     GLES20.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+//    GLES20.glGenFramebuffers(1, frameBuffers, 0);
     GLES20.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_NEAREST);
     GLES20.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
     GLES20.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S, GL10.GL_REPEAT);
@@ -113,14 +118,17 @@ import javax.microedition.khronos.opengles.GL10;
   @Override
   public void draw(int frameTexture, long frameTimestampUs) {
     // Draw to the canvas and store it in a texture.
-    String text = String.format(Locale.US, "%.02f", frameTimestampUs / (float) C.MICROS_PER_SECOND);
-    overlayBitmap.eraseColor(Color.TRANSPARENT);
-    overlayCanvas.drawBitmap(logoBitmap, /* left= */ 32, /* top= */ 32, paint);
-    overlayCanvas.drawText(text, /* x= */ 200, /* y= */ 130, paint);
-    GLES20.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
-    GLUtils.texSubImage2D(
-        GL10.GL_TEXTURE_2D, /* level= */ 0, /* xoffset= */ 0, /* yoffset= */ 0, overlayBitmap);
-    GlUtil.checkGlError();
+//    String text = String.format(Locale.US, "%.02f", frameTimestampUs / (float) C.MICROS_PER_SECOND);
+//    overlayBitmap.eraseColor(Color.TRANSPARENT);
+//    overlayCanvas.drawBitmap(logoBitmap, /* left= */ 32, /* top= */ 32, paint);
+//    overlayCanvas.drawText(text, /* x= */ 200, /* y= */ 130, paint);
+//    GLES20.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
+//    GLUtils.texSubImage2D(
+//        GL10.GL_TEXTURE_2D, /* level= */ 0, /* xoffset= */ 0, /* yoffset= */ 0, overlayBitmap);
+//    GlUtil.checkGlError();
+//
+//    //
+//    GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
     // Run the shader program.
     GlUtil.Uniform[] uniforms = Assertions.checkNotNull(this.uniforms);
@@ -153,7 +161,7 @@ import javax.microedition.khronos.opengles.GL10;
     GlUtil.checkGlError();
   }
 
-  private static String loadAssetAsString(Context context, String assetFileName) {
+  public static String loadAssetAsString(Context context, String assetFileName) {
     @Nullable InputStream inputStream = null;
     try {
       inputStream = context.getAssets().open(assetFileName);

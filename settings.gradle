@@ -29,4 +29,6 @@ project(modulePrefix + 'demo-gl').projectDir = new File(rootDir, 'demos/gl')
 project(modulePrefix + 'demo-surface').projectDir = new File(rootDir, 'demos/surface')
 project(modulePrefix + 'playbacktests').projectDir = new File(rootDir, 'playbacktests')
 
+include ':GLRenderCapture'
+
 apply from: 'core_settings.gradle'

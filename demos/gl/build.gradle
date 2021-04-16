@@ -13,6 +13,7 @@
 // limitations under the License.
 apply from: '../../constants.gradle'
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion project.ext.compileSdkVersion
@@ -27,6 +28,7 @@ android {
         versionCode project.ext.releaseVersionCode
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.appTargetSdkVersion
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -42,13 +44,25 @@ android {
         // This demo app does not have translations.
         disable 'MissingTranslation'
     }
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+        }
+    }
 }
 
 dependencies {
     implementation project(modulePrefix + 'library-core')
     implementation project(modulePrefix + 'library-ui')
     implementation project(modulePrefix + 'library-dash')
+    implementation project(modulePrefix + 'GLRenderCapture')
+    implementation 'com.android.support:multidex:1.0.3'
     implementation 'androidx.annotation:annotation:' + androidxAnnotationVersion
     compileOnly 'org.checkerframework:checker-qual:' + checkerframeworkVersion
     compileOnly 'org.checkerframework:checker-compat-qual:' + checkerframeworkCompatVersion
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }
